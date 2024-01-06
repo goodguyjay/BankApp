@@ -1,32 +1,33 @@
 #include "BankAccount.hpp"
 
-//TODO transformar esta merda em funcao
-unsigned int matchAccountInfo(unsigned int userInput, BankAccount *fakeBank) {
-    for (int i = 0; i < 3; i++) {
-        if (fakeBank->getAccountNumber() != userInput) {
-            cout << "["<< i + 1 << "] "
-                 << "Sorry! No account matching that number was found. Please try again!" << endl;
-            cin >> userInput;
-        } else {
-            return userInput;
-        }
+void clear_screen() { std::cout << "\x1B[2J\x1B[H"; };
+
+void clear_memory(BankAccount *fakeBankAccounts[]) {
+    for (int i = 0; i < 500; i ++) {
+        delete fakeBankAccounts[i];
     }
-    return false;
+
+    delete[] fakeBankAccounts;
 }
 
 int main() {
 
     int choice = 0;
-    auto fakeBank = new BankAccount("fake", 0, 0, 0);
-    //auto test = new BankAccount("test account", 1111, 9999, 1500);
-    unsigned int accCounter = 1000; //TODO change those variable names
-    unsigned int accNumber = 0;
+    auto **fakeBankAccounts = new BankAccount *[500];
+
+    for (int i = 0; i < 500; i++) {
+        fakeBankAccounts[i] = nullptr;
+    }
+
+    unsigned int accCounter = 1;
+    unsigned int accNumber = 1;
     unsigned int password;
     double amount;
 
+    cout << "Hi! Welcome to FakeBank(not a scam)." << endl;
+    cout << "How can may i help you?" << endl;
+
     do {
-        cout << "Hi! Welcome to FakeBank(not a scam)." << endl;
-        cout << "How can may i help you?" << endl;
         cout << "----------------------------------" << endl;
         cout << "[1]I would like to open a account." << endl;
         cout << "[2]I would like to see my funds." << endl;
@@ -35,97 +36,161 @@ int main() {
         cout << "[5]I would like to delete my account." << endl;
         cout << "[0]Leave" << endl;
         cin >> choice;
+        clear_screen();
 
         switch(choice) {
             case 1: {
-                BankAccount::createAccount(fakeBank, accCounter);
-                fakeBank->displayAccountInfo();
+                auto *fakeAccount = new BankAccount();
+                *fakeAccount = BankAccount::createAccount(accNumber);
+                fakeBankAccounts[accNumber] = fakeAccount;
+                clear_screen();
+                fakeBankAccounts[accNumber]->displayAccountInfo();
                 accCounter++;
+                accNumber++;
                 break;
-                // TODO this is absolute shit
             }
 
             case 2: {
-                cout << "All right! Please type in your account number: (4 numbers) ";
+                int i = 0;
+                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
                 cin >> accNumber;
 
-                for (int i = 0; i < 3; i++) {
-                    if (fakeBank->getAccountNumber() != accNumber) {
-                        cout << "[" << i + 1 << "] "
-                             << "Sorry! No account matching that number was found. Please try again!" << endl;
-                        cin >> accNumber;
-                    } else {
-                        break;
+                if (accNumber == 0) {
+                    break;
+                }
+
+                while (accNumber >= accCounter) {
+                    cout << "["<< i << "] " << "This account do not exist. Please try again." << endl;
+                    cin.ignore();
+                    cin >> accNumber;
+                    i++;
+
+                    if (i == 3) {
+                        cout << "Too many number of attempts. Please try again later.";
+                        clear_memory(fakeBankAccounts);
+                        return 0;
                     }
                 }
 
-                cout << "Hello " << fakeBank->getAccountHolderName() << " !" << endl;
+                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
+                    cout << "Too many number of attempts. Please try again." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
+                }
+
+                clear_screen();
+                cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;
                 cout << "Type in your password: ";
                 cin >> password;
 
-                if (fakeBank->verifyPin(password)) {
-                    cout << "Welcome!" << endl;
-                    fakeBank->displayAccountInfo();
-                } else {
-                    cout << "nope" << endl;
+                while (!fakeBankAccounts[accNumber]->verifyPin(password) && i < 4) {
+                    cout << "["<< i + 1 << "] " << "This password do not match with this account. Please try again." << endl;
+                    cin.ignore();
+                    cin >> password;
+                    i++;
+
+                    if (i == 3) {
+                        cout << "Too many number of attempts. Please try again later.";
+                        clear_memory(fakeBankAccounts);
+                        return 0;
+                    }
                 }
+
+                fakeBankAccounts[accNumber]->displayAccountInfo();
 
                 break;
             }
 
             case 3: {
-                cout << "All right! Please type in your account number: ";
+                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
                 cin >> accNumber;
-
-                if (!matchAccountInfo(accNumber, fakeBank)) {
-                    return 1;
+                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
+                    cout << "Too many number of attempts. Please try again." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
                 }
 
-                cout << "Alright, " << fakeBank->getAccountHolderName() << endl;
+                cout << "Alright, " << fakeBankAccounts[accNumber]->getAccountHolderName() << endl;
                 cout << "How much you want to deposit?" << endl;
                 cout << "U$";
                 cin >> amount;
-                fakeBank->deposit(amount); // TODO TRATAR VALORES NEGATIVOS
-                fakeBank->displayAccountInfo();
+                fakeBankAccounts[accNumber]->deposit(amount);
+
+                fakeBankAccounts[accNumber]->displayAccountInfo();
                 amount = 0;
                 break;
             }
 
             case 4: {
-                cout << "Alright, " << fakeBank->getAccountHolderName() << endl;
+                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
+                cin >> accNumber;
+
+                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
+                    cout << "Too many number of attempts. Please try again." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
+                }
+                clear_screen();
+
+                cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;
+                cout << "Type in your password: ";
+                cin >> password;
+
+                if (fakeBankAccounts[accNumber]->verifyPin(password)) {
+                    cout << "Welcome!" << endl;
+                    fakeBankAccounts[accNumber]->displayAccountInfo();
+                } else {
+                    cout << "The password does not match this account." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
+                }
+                clear_screen();
+
+                cout << "Alright, " << fakeBankAccounts[accNumber]->getAccountHolderName() << endl;
                 cout << "How much you want to withdraw?" << endl;
                 cout << "U$";
                 cin >> amount;
 
-                while (!fakeBank->withdraw(amount)) {
-                    fakeBank->displayAccountInfo();
+                while (!fakeBankAccounts[accNumber]->withdraw(amount)) {
+                    fakeBankAccounts[accNumber]->displayAccountInfo();
                     cin >> amount;
                 }
-                fakeBank->displayAccountInfo();
+                fakeBankAccounts[accNumber]->displayAccountInfo();
                 amount = 0;
                 break;
             }
 
-            case 5: { //todo please fix this, jesus christ
-                cout << "Okay, please type in the account number: ";
+            case 5: {
+                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
                 cin >> accNumber;
-                if (!matchAccountInfo(accNumber, fakeBank)) {
-                    return 1;
+
+                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
+                    cout << "Too many number of attempts. Please try again." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
                 }
-                cout << "Please type in your PIN: ";
+                clear_screen();
+
+                cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;
+                cout << "Type in your password: ";
                 cin >> password;
-                if (fakeBank->verifyPin(password)) {
+
+                if (fakeBankAccounts[accNumber]->verifyPin(password)) {
                     char deleteChoice;
-                    cout << "Are you sure? [Y] [N]";
+                    cout << "Are you sure? [Y] [N]: ";
                     cin >> deleteChoice;
                     if (std::tolower(deleteChoice) == 'y') {
-                        delete fakeBank;
-                        cout << "Account successfully deleted.";
+                        delete fakeBankAccounts[accNumber];
+                        cout << "Account sucessfully deleted." << endl;
                         break;
                     }
                 } else {
-                    cout << "Wrong password.";
+                    cout << "The password does not match this account." << endl;
+                    clear_memory(fakeBankAccounts);
+                    return 0;
                 }
+
+                clear_screen();
 
             }
 
@@ -135,7 +200,7 @@ int main() {
 
     } while (choice != 0);
 
-    delete fakeBank;
+    clear_memory(fakeBankAccounts);
 
     return 0;
 }

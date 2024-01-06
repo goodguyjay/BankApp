@@ -11,16 +11,17 @@ private:
 
 public:
     BankAccount(string accountHolderName, unsigned int pin, unsigned int accountNumber, double accountBalance);
-    static void createAccount(BankAccount *fakeAccount, unsigned int accNumber);
+    BankAccount();
+    static BankAccount createAccount(unsigned int accNumber);
     void displayAccountInfo();
-    //void displayAccountFunds(unsigned int accNumber,unsigned int pin); TODO LATER
-    bool verifyPin(unsigned int inputPin);
+    bool verifyPin(unsigned int inputPin) const;
     void deposit(double depositValue);
     bool withdraw(double withdrawValue);
-    void deleteAccount(BankAccount *account);
+    //void deleteAccount(BankAccount *account); //TODO check if this is useful anyhow
     unsigned int getAccountNumber() const;
-    unsigned int getPin();
+    unsigned int getPin(); //TODO check if this is useful anyhow
     string getAccountHolderName();
-    bool isAccountNumberValid(unsigned int accNumber);
+    //bool isAccountNumberValid(unsigned int accNumber);
+    unsigned int matchAccountInfo(unsigned int userInput);
     //unsigned int matchAccount();
 };
