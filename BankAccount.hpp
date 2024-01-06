@@ -22,6 +22,6 @@ public:
     unsigned int getPin(); //TODO check if this is useful anyhow
     string getAccountHolderName();
     //bool isAccountNumberValid(unsigned int accNumber);
-    unsigned int matchAccountInfo(unsigned int userInput);
+    unsigned int matchAccountInfo(unsigned int userInput) const;
     //unsigned int matchAccount();
 };

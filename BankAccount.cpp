@@ -116,7 +116,7 @@ void BankAccount::deleteAccount(BankAccount *account) {
     return false;
 }*/
 
-unsigned int BankAccount::matchAccountInfo(unsigned int userInput) {
+unsigned int BankAccount::matchAccountInfo(unsigned int userInput) const {
     for (int i = 0; i < 3; i++) {
         if (this->getAccountNumber() != userInput) {
             cout << "[" << i + 1 << "] "
