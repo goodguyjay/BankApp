@@ -10,36 +10,41 @@ void clearMemory(BankAccount *fakeBankAccounts[]) {
     delete[] fakeBankAccounts;
 }
 
-bool accountNumberValidation(unsigned int &accNumber, unsigned int &accCounter) {
+unsigned int authentication(BankAccount **fakeBankAccounts, unsigned int &accNumber) {
+    unsigned int password;
+    cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
+    cin >> accNumber;
 
-    if (accNumber == 0) {
-        return false;
+    if (!BankAccount::isAccountNumberValid(accNumber)) {
+        return 1;
     }
 
-    int i = 0;
-
-    while ((accNumber >= accCounter) && (accNumber > 9999) && (accNumber < 0)) {
-        cout << "["<< i + 1 << "] " << "This account do not exist. Please try again." << endl;
-        cin >> accNumber;
-        i++;
-
-        if (i == 3) {
-            cout << "Too many number of attempts. Please try again later.";
-            return false;
-        }
+    if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
+        cout << "Too many number of attempts. Please try again later." << endl;
+        return 1;
     }
 
-    return true;
+    clearScreen();
+
+    cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !"<< endl;
+    cout << "Type in your password: ";
+    cin >> password;
+
+    if (!fakeBankAccounts[accNumber]->isPasswordValid(password)) {
+        cout << "Too many number of attempts. Please try again later.";
+        return 1;
+    }
+
+    return accNumber;
 }
 
 int main() {
 
     int choice = 0;
-    unsigned int accCounter = 1;
-    unsigned int accNumber = 0;
+    unsigned int accNumber = 1;
     unsigned int password = 0;
     double amount = 0;
-    int i = 0;
+    int i;
 
     auto **fakeBankAccounts = new BankAccount *[500];
     for (i = 0; i < 500; i++) {
@@ -63,65 +68,29 @@ int main() {
         switch(choice) {
             case 1: {
                 auto *fakeAccount = new BankAccount();
-                *fakeAccount = BankAccount::createAccount(accCounter);
+                *fakeAccount = BankAccount::createAccount();
+                accNumber = BankAccount::getAccountGenerator();
                 fakeBankAccounts[accNumber] = fakeAccount;
+
                 clearScreen();
 
                 fakeBankAccounts[accNumber]->displayAccountInfo();
-                accCounter++;
+                BankAccount::incrementAccountGenerator();
                 break;
             }
 
             case 2: {
-                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
-                cin >> accNumber;
-
-                if (!accountNumberValidation(accNumber, accCounter)) {
+                if(authentication(fakeBankAccounts, accNumber) == 1) {
                     break;
                 }
-
-                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
-                    cout << "Too many number of attempts. Please try again later." << endl;
-                    clearMemory(fakeBankAccounts);
-                    return 0;
-                }
-                clearScreen();
-
-                cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;
-                cout << "Type in your password: ";
-                cin >> password;
-
-                i = 0;
-                while (!fakeBankAccounts[accNumber]->verifyPin(password) && i < 4) {
-                    cout << "["<< i + 1 << "] " << "The password do not match with this account. Please try again." << endl;
-                    cin.ignore();
-                    cin >> password;
-                    i++;
-
-                    if (i == 3) {
-                        cout << "Too many number of wrong attempts. Please try again later.";
-                        clearMemory(fakeBankAccounts);
-                        return 0;
-                    }
-                }
-
                 fakeBankAccounts[accNumber]->displayAccountInfo();
 
                 break;
             }
 
             case 3: {
-                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
-                cin >> accNumber;
-
-                if (!accountNumberValidation(accNumber, accCounter)) {
+                if(authentication(fakeBankAccounts, accNumber) == 1) {
                     break;
-                }
-
-                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
-                    cout << "Too many number of attempts. Please try again." << endl;
-                    clearMemory(fakeBankAccounts);
-                    return 0;
                 }
 
                 cout << "Alright, " << fakeBankAccounts[accNumber]->getAccountHolderName() << endl;
@@ -136,14 +105,10 @@ int main() {
             }
 
             case 4: {
-                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
-                cin >> accNumber;
-
-                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
-                    cout << "Too many number of attempts. Please try again." << endl;
-                    clearMemory(fakeBankAccounts);
-                    return 0;
+                if(authentication(fakeBankAccounts, accNumber) == 1) {
+                    break;
                 }
+
                 clearScreen();
 
                 cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;
@@ -175,14 +140,10 @@ int main() {
             }
 
             case 5: {
-                cout << "All right! Please type in your account number (Type 0 to leave this menu): ";
-                cin >> accNumber;
-
-                if (!fakeBankAccounts[accNumber]->matchAccountInfo(accNumber)) {
-                    cout << "Too many number of attempts. Please try again." << endl;
-                    clearMemory(fakeBankAccounts);
-                    return 0;
+                if(authentication(fakeBankAccounts, accNumber) == 1) {
+                    break;
                 }
+
                 clearScreen();
 
                 cout << "Hello " << fakeBankAccounts[accNumber]->getAccountHolderName() << " !" << endl;

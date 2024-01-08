@@ -1,5 +1,7 @@
 #include "BankAccount.hpp"
 
+unsigned int BankAccount::accountGenerator = 1;
+
 BankAccount::BankAccount() = default;
 
 BankAccount::BankAccount(std::string accountHolderName, unsigned int pin, unsigned int accountNumber,
@@ -10,50 +12,34 @@ BankAccount::BankAccount(std::string accountHolderName, unsigned int pin, unsign
     this->accountBalance = accountBalance;
 }
 
-/*BankAccount BankAccount::createAccount(BankAccount *fakeAccount, unsigned int accNumber) {
+BankAccount BankAccount::createAccount() {
     string name;
-    unsigned int temp_pin;
-    cout << "All right! We'll need your name to start: ";
-    cin >> name;
-
-    cout << endl;
-
-    cout << "Okay! Now please type your password (4 numbers): ";
-    cin >> temp_pin;
-
-    fakeAccount = new BankAccount(name, temp_pin, accNumber, 0);
-
-    cout << "All done! You account number is " << accNumber << endl;
-    cout << "You can enter with your account number and pin." << endl;
-    cout << "Thanks for choosing FakeBank! (not a scam)" << endl;
-
-    cout << endl;
-
-    return *fakeAccount;
-}*/
-
-BankAccount BankAccount::createAccount(unsigned int accNumber) {
-    string name;
-    unsigned int temp_pin;
-    cout << "All right! We'll need your name to start: ";
+    unsigned int pin = 0;
+    cout << "All right! We'll need your first name to start: ";
     cin.ignore();
     getline(cin, name);
-
-
     cout << endl;
 
     cout << "Okay! Now please type your password (4 numbers): ";
-    cin >> temp_pin;
+    cin >> pin;
 
-    BankAccount tempAccount(name, temp_pin, accNumber, 0);
+//TODO FIX THIS PLEASE DEAR GOD
+/*    while(pin > 9999 || pin <= 0) {
+        cout << "This password is not permitted. Please type a valid password with 4 numbers." << endl;
+        cout << "New password: ";
+        cin.ignore();
+        pin = 0;
+        cin >> pin;
+    }*/
 
-    cout << "All done! You account number is " << accNumber << endl;
+    BankAccount account(name, pin, BankAccount::getAccountGenerator(), 0);
+
+    cout << "All done! You account number is " << account.getAccountNumber() << endl;
     cout << "You can enter with your account number and pin." << endl;
     cout << "Thanks for choosing FakeBank! (not a scam)" << endl;
 
     cout << endl;
-
-    return tempAccount;
+    return account;
 }
 
 void BankAccount::displayAccountInfo() {
@@ -62,10 +48,6 @@ void BankAccount::displayAccountInfo() {
     cout << "Name: " << this->accountHolderName <<endl;
     cout << "Balance: " << this->accountBalance << endl;
     cout << "----------------" << endl;
-}
-
-unsigned int BankAccount::getPin() {
-    return this->pin;
 }
 
 string BankAccount::getAccountHolderName() {
@@ -101,30 +83,78 @@ bool BankAccount::withdraw(double withdrawValue) {
     return true;
 }
 
-/*
-void BankAccount::deleteAccount(BankAccount *account) {
-    delete account;
-}
-*/
-
-/*bool BankAccount::isAccountNumberValid(unsigned int accNumber) {
-    // this is a fucking wackjob idea but it'll work i promise
-    if(accNumber <= 9999 && accNumber >= 1000) {
-        return true;
-    }
-
-    return false;
-}*/
-
 unsigned int BankAccount::matchAccountInfo(unsigned int userInput) const {
+    // TODO PROHIBIT CHARACTERS
     for (int i = 0; i < 3; i++) {
-        if (this->getAccountNumber() != userInput) {
+        if (getAccountNumber() != userInput) {
             cout << "[" << i + 1 << "] "
             << "Sorry! No account matching that number was found. Please try again!" << endl;
+            cin.ignore();
+            userInput = 0;
             cin >> userInput;
         } else {
             return userInput;
         }
     }
     return false;
+}
+
+// TODO PROHIBIT CHARACTERS
+bool BankAccount::isAccountNumberValid(unsigned int &accNumber) {
+
+    if (accNumber == 0) {
+        return false;
+    }
+
+    int i = 0;
+
+    while ((accNumber >= BankAccount::getAccountGenerator()) || (accNumber > 9999)) {
+        cout << "["<< i + 1 << "] " << "This account do not exist. Please try again." << endl;
+        cin.ignore();
+        accNumber = 0;
+        cin >> accNumber;
+        i++;
+
+        if (accNumber == 0) {
+            return false;
+        }
+
+        if (i == 3) {
+            cout << "Too many number of attempts. Please try again later." << endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+unsigned int BankAccount::getAccountGenerator() {
+    return accountGenerator;
+}
+
+void BankAccount::incrementAccountGenerator() {
+    BankAccount::accountGenerator++;
+}
+
+// TODO PROHIBIT CHARACTERS
+bool BankAccount::isPasswordValid(unsigned int &inputPin) const {
+    if(inputPin == 0) {
+        return false;
+    }
+
+    unsigned int i = 0;
+    while ((!this->verifyPin(inputPin)) || (inputPin > 9999)) {
+        cout << "["<< i + 1 << "] " << "The password do not match with this account. Please try again." << endl;
+        cin.ignore();
+        inputPin = 0;
+        cin >> inputPin;
+        i++;
+
+        if (i == 3) {
+            cout << "Too many number of wrong attempts. Please try again later." << endl;
+            return false;
+        }
+    }
+
+    return true;
 }
