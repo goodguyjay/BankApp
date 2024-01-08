@@ -1,3 +1,0 @@
-/home/jay/CLionProjects/BankAccount/cmake-build-debug/CMakeFiles/BankAccount.dir
-/home/jay/CLionProjects/BankAccount/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/jay/CLionProjects/BankAccount/cmake-build-debug/CMakeFiles/rebuild_cache.dir
